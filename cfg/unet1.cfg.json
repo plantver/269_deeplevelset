@@ -7,7 +7,7 @@
     "train_summary_interval": 5,
     "validation_interval": 5,
     "snapshot_interval": 100,
-    "max_iteration": 20000,
+    "max_iteration": 5000,
     "pretrained_model": null,
     "net": {
       "name": "unet1",
