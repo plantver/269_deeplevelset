@@ -1,0 +1,24 @@
+._*.*
+\#*#
+.#*
+**/__pycache__/
+.cache/
+.*/
+*.swp
+*.log
+*.pyc
+build-cmake/
+build/
+processed/
+processed-dicom/
+**.sublime-workspace
+.ipynb_checkpoints/
+#*.*#
+
+# caffemodel is huge!
+*.caffemodel
+# *.json
+*.log
+.idea
+#.h5
+experiments/*
