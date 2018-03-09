@@ -120,6 +120,9 @@ class Net():
             self.logits = self.end_points[layer_name] = add_conv_bn_relu(net, 1, 3, is_train_net, layer_name,
                                                                  weight_decay)
 
+        # model outputs
+        with tf.variable_scope("model_outpus"):
+            self.probabilities = tf.nn.sigmoid(self.logits)
 
         # objective
         with tf.variable_scope("losses"):
@@ -129,7 +132,7 @@ class Net():
             with tf.variable_scope("softmax_cross_entropy"):
                 self.loss_sce = tf.reduce_sum(tf.losses.sigmoid_cross_entropy(self.target, self.logits))
             self.loss = tf.add(self.loss_sce, self.reg_losses)
-            self.dice = self._dice(self.input, self.target)
+            self.dice = self._dice(self.probabilities, self.target)
 
         # optimizer
         if is_train_net:
@@ -144,10 +147,6 @@ class Net():
                     # ).minimize(self.loss, global_step=global_step)
                     self.optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(self.loss, global_step=global_step)
 
-        # model outputs
-        with tf.variable_scope("model_outpus"):
-            self.probabilities = tf.nn.sigmoid(self.logits)
-
         # summaries
         prefix = "train_" if is_train_net else "validation_"
         with tf.variable_scope(prefix + "summaries"):
@@ -159,8 +158,12 @@ class Net():
             # self.summary_node_list.append(tf.summary.scalar(prefix + 'streaming_auc', self.auc))
             self.summary_node_list.append(tf.summary.scalar(prefix + 'batch_loss', self.loss_sce))
             self.summary_node_list.append(tf.summary.scalar(prefix + 'dice', self.dice))
-            self.summary_node_list.append(tf.summary.image(prefix + 'input', self.input[:, :, :, :], max_outputs=20))
-            self.summary_node_list.append(tf.summary.image(prefix + 'output', self.probabilities[:, :, :, :], max_outputs=20))
+            self.summary_node_list.append(tf.summary.image(prefix + 'img',
+                                                           tf.concat([self.input[:, :, :, :],
+                                                                      self.target[:,:,:,:],
+                                                                      self.probabilities[:, :, :, :]], axis=1),
+                                                           max_outputs=20))
+
             if is_train_net:
                 self.summary_node_list.append(tf.summary.scalar(prefix + 'global_step', global_step))
                 self.summary_node_list.append(tf.summary.scalar(prefix + 'learing_rate', learning_rate_expdecay))
