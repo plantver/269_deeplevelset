@@ -9,8 +9,9 @@ import json
 import argparse
 from shutil import copyfile
 import tensorflow as tf
-from inputQueue import simple_generator
+from data.inputQueue import simple_generator
 from tqdm import tqdm
+import h5py
 #import pdb; pdb.set_trace()
 """
 example usage: python train.py --cfg cfgs/xxx.cfg
@@ -47,10 +48,8 @@ def main(config_file):
     net = net_class(params["net"], *input_gen.lst_placeholders, is_train_net=False, reuse=False)
 
     # ================== TEST
-    lst_pids = list()
-    lst_y_predicted = list()
-    lst_y_probability = list()
-    lst_y_true = list()
+    # create output h5 file
+    h5f = h5py.File(os.path.join(testresult_dir, "%s_predictions.h5" % (params["prefix"])), "w")
 
     with tf.Session() as sess:
 
@@ -66,18 +65,13 @@ def main(config_file):
             exit(1)
 
         for feed_dict, pid in tqdm(input_gen.generate_feed_dict()):
-            prediction, probability, label = sess.run([net.prediction, net.probability, net.label], feed_dict=feed_dict)
-            lst_pids.append(pid)
-            lst_y_predicted.append(prediction)
-            lst_y_probability.append(probability)
-            lst_y_true.append(label)
+            pmap, dice = sess.run([net.probabilities, net.dice], feed_dict=feed_dict)
+            g = h5f.create_group(pid)
+            g.create_dataset("pmap", data=pmap)
+            g.create_dataset("dice", data=dice)
 
-    with open(os.path.join(testresult_dir, "%s_%s_predictions_results.json"%(params["prefix"], os.path.basename(pretrained_model))), 'w') as f:
-        json.dump({"pid": lst_pids,
-                   "y_true": list(map(float, lst_y_true)),
-                   "y_predicted": list(map(float, lst_y_predicted)),
-                   "y_probability": list(map(float, lst_y_probability))}, f)
-
+    # save the predictions
+    h5f.close()
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
