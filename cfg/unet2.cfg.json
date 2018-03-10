@@ -1,0 +1,111 @@
+{
+  "train": {
+    "project_tag": "269_unet2",
+    "net_name": "unet2",
+    "gpu_id": "0",
+    "parent_save_location": "/mnt/dfs/xjyan/269-deeplevelset-segmentation/experiments",
+    "train_summary_interval": 5,
+    "validation_interval": 5,
+    "snapshot_interval": 100,
+    "max_iteration": 5000,
+    "pretrained_model": null,
+    "net": {
+      "name": "unet2",
+      "weight_decay": 0.00005,
+      "decay_step": 2000,
+      "learning_rate": 0.001,
+      "is_learning_rate_decay": true
+    },
+    "input": {
+      "h5files": [
+        "/mnt/dfs/xjyan/patches/269_train_patch_2class.h5"
+      ],
+      "batch_size": 20,
+      "load": [
+        {
+          "name": "ct_slice",
+          "shape": [
+            512,
+            512
+          ]
+        },
+        {
+          "name": "mask",
+          "shape": [
+            512,
+            512,
+            2
+          ]
+        }
+      ],
+      "balance": {
+        "flg": false,
+        "class_key": "class",
+        "ratio": {
+          "1": 1,
+          "0": 1
+        }
+      }
+    },
+    "validation_input": {
+      "h5files": [
+      ],
+      "batch_size": 10,
+      "load": [
+      ],
+      "balance": {
+        "flg": false,
+        "class_key": "class",
+        "ratio": {
+          "1": 1,
+          "0": 1
+        }
+      }
+    }
+  },
+  "test": {
+    "project_tag": "269_unet1",
+    "net_name": "unet1",
+    "gpu_id": "0",
+    "parent_save_location": "/mnt/dfs/xjyan/269-deeplevelset-segmentation/experiments",
+    "pretrained_model": "/mnt/dfs/xjyan/269-deeplevelset-segmentation/experiments/269_unet1/snapshots/269_unet1_iter_900",
+    "prefix": "unet1_3_9",
+    "net": {
+      "name": "unet1",
+      "weight_decay": 0.00005,
+      "decay_step": 2000,
+      "learning_rate": 0.001,
+      "is_learning_rate_decay": true
+    },
+    "validation_input": {
+      "h5files": [
+        "/mnt/dfs/xjyan/patches/269_test_patch_0.h5"
+      ],
+      "batch_size": 5,
+      "load": [
+        {
+          "name": "ct_slice",
+          "shape": [
+            512,
+            512
+          ]
+        },
+        {
+          "name": "mask",
+          "shape": [
+            512,
+            512
+          ]
+        }
+      ],
+      "balance": {
+        "flg": false,
+        "class_key": "class",
+        "ratio": {
+          "1": 1,
+          "0": 1
+        }
+      }
+    }
+  }
+}
