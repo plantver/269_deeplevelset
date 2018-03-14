@@ -13,6 +13,11 @@ class Net():
         with tf.variable_scope("dice"):
             return tf.reduce_sum(tf.multiply(i1, i2)) * 2 / (tf.reduce_sum(i1) + tf.reduce_sum(i2))
 
+    def _binarydice(self, prob, target):
+        with tf.variable_scope("binary_dice"):
+            prob = tf.round(prob)
+            return tf.reduce_sum(tf.multiply(prob, target)) * 2 / (tf.reduce_sum(prob) + tf.reduce_sum(target))
+
     def _convtranspose_concate(self, i1, i2, filters, padding='same', scope="convtranspose_concate", reuse=None):
         with tf.variable_scope(scope, reuse=reuse):
             return tf.concat(values=[
@@ -133,6 +138,8 @@ class Net():
                 self.loss_sce = tf.reduce_sum(tf.losses.sigmoid_cross_entropy(self.target, self.logits))
             self.loss = tf.add(self.loss_sce, self.reg_losses)
             self.dice = self._dice(self.probabilities, self.target)
+            self.binary_dice = self._binarydice(self.probabilities, self.target)
+            self.loss = tf.add(self.loss, -self.binary_dice)
 
         # optimizer
         if is_train_net:
@@ -158,6 +165,8 @@ class Net():
             # self.summary_node_list.append(tf.summary.scalar(prefix + 'streaming_auc', self.auc))
             self.summary_node_list.append(tf.summary.scalar(prefix + 'batch_loss', self.loss_sce))
             self.summary_node_list.append(tf.summary.scalar(prefix + 'dice', self.dice))
+            # self.summary_node_list.append(tf.summary.scalar(prefix + 'cross-entropy', self.loss_sce))
+            self.summary_node_list.append(tf.summary.scalar(prefix + 'binary-dice', self.binary_dice))
             self.summary_node_list.append(tf.summary.image(prefix + 'img',
                                                            tf.concat([self.input[:, :, :, :],
                                                                       tf.expand_dims(self.target[ :, :, :, 0], axis=-1),

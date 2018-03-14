@@ -47,9 +47,9 @@ def main(config_file):
         os.makedirs(snapshot_dir)
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-    else:
-        shutil.rmtree(log_dir)
-        os.makedirs(log_dir)
+    # else:
+    #     shutil.rmtree(log_dir)
+    #     os.makedirs(log_dir)
 
     # copy config file to the target dir
     copyfile(config_file, os.path.join(project_dir, os.path.basename(config_file)))
@@ -111,7 +111,8 @@ def main(config_file):
         while get_glbstep(sess) < max_global_step:
             sess.run([tr_net.optimizer, tr_net.stream_update_ops])
 
-            print('step %s dice %s'%(get_glbstep(sess), sess.run(tr_net.dice)))
+            print('step %s dice %s binary dice %s'%(
+                get_glbstep(sess), sess.run(tr_net.dice), sess.run(tr_net.binary_dice)))
 
             if get_glbstep(sess) % train_summary_interval == 0:
                 summaries_evaluated = sess.run(tr_summaries)
