@@ -140,6 +140,7 @@ class Net():
             self.dice = self._dice(self.probabilities, self.target)
             self.binary_dice = self._binarydice(self.probabilities, self.target)
             self.loss = tf.add(self.loss, -self.binary_dice)
+            self.binary_mask = tf.round(self.probabilities)
 
         # optimizer
         if is_train_net:

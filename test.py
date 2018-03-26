@@ -65,10 +65,11 @@ def main(config_file):
             exit(1)
 
         for feed_dict, pid in tqdm(input_gen.generate_feed_dict()):
-            pmap, dice = sess.run([net.probabilities, net.dice], feed_dict=feed_dict)
+            pmap, dice, binary_mask = sess.run([net.probabilities, net.dice, net.binary_mask], feed_dict=feed_dict)
             g = h5f.create_group(pid)
             g.create_dataset("pmap", data=pmap)
             g.create_dataset("dice", data=dice)
+            g.create_dataset("binary_mask", data=binary_mask)
 
     # save the predictions
     h5f.close()
