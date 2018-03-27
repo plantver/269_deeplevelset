@@ -102,11 +102,21 @@ class MSnake:
         # cca, keep only largest component.
         labels, n = scipy.ndimage.measurements.label(mask)
 
-        self.mask = np.zeros(mask.shape)
-        self.mask[labels == (np.bincount(labels.flat)[1:].argmax() + 1)] = 1
+        # largest CC
+        # self.mask = np.zeros(mask.shape)
+        # self.mask[labels == (np.bincount(labels.flat)[1:].argmax() + 1)] = 1
+
+        # thresholded  CC
+        cc_box_size = lambda t: (t[0].stop-t[0].start)*(t[1].stop-t[1].start)
+
+        cc_slices = scipy.ndimage.measurements.find_objects(labels, max_label=99)
+        self.mask = np.copy(mask)
+        for i in range(n):
+            t_s = cc_slices[i]
+            if cc_box_size(t_s) < 100:
+                self.mask[t_s] = 0
 
         self.init_mask = np.copy(self.mask)
-
         self.img = img
         self.smoothing = smoothing
         self.lambda1 = lambda1
