@@ -1,0 +1,45 @@
+{
+    "project_tag": "269_unet2",
+    "net_name": "unet2",
+    "gpu_id": "0",
+    "pretrained_model": "demo/trained_nn/269_unet2_iter_5000",
+    "net": {
+      "name": "unet2",
+      "weight_decay": 0.00005,
+      "decay_step": 2000,
+      "learning_rate": 0.001,
+      "is_learning_rate_decay": true
+    },
+    "validation_input": {
+      "h5files": [
+        "demo/demo_data.hdf5"
+      ],
+      "batch_size": 5,
+      "load": [
+        {
+          "name": "ct_slice",
+          "shape": [
+            512,
+            512
+          ]
+        },
+        {
+          "name": "mask",
+          "shape": [
+            512,
+            512,
+            2
+          ]
+        }
+      ],
+      "balance": {
+        "flg": false,
+        "class_key": "class",
+        "ratio": {
+          "1": 1,
+          "0": 1
+        }
+      }
+    }
+  }
+

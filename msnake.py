@@ -1,4 +1,7 @@
-# credit to https://github.com/pmneila/morphsnakes#id5
+########################################################
+# credit to https://github.com/pmneila/morphsnakes#id5 #
+########################################################
+
 
 import numpy as np
 from itertools import cycle
@@ -109,11 +112,11 @@ class MSnake:
         # thresholded  CC
         cc_box_size = lambda t: (t[0].stop-t[0].start)*(t[1].stop-t[1].start)
 
-        cc_slices = scipy.ndimage.measurements.find_objects(labels, max_label=99)
+        cc_slices = scipy.ndimage.measurements.find_objects(labels, max_label=999)
         self.mask = np.copy(mask)
         for i in range(n):
             t_s = cc_slices[i]
-            if cc_box_size(t_s) < 100:
+            if t_s is not None and cc_box_size(t_s) < 100:
                 self.mask[t_s] = 0
 
         self.init_mask = np.copy(self.mask)
@@ -146,7 +149,15 @@ class MSnake:
 
             for j in range(self.smoothing):
                 self.mask = curvop(self.mask)
-
             l_ev.append(np.copy(self.mask))
+
+        # get largets cc after MGAC iteration
+        labels, n = scipy.ndimage.measurements.label(self.mask)
+
+        # largest CC
+        self.mask = np.zeros(self.mask.shape)
+        self.mask[labels == (np.bincount(labels.flat)[1:].argmax() + 1)] = 1
+
+        l_ev.append(np.copy(self.mask))
 
         return l_ev
