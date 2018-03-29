@@ -1,5 +1,7 @@
 # CS269 2018 winter Deep MGAC
 
+### Xingjian Yan, Ali Hatamizadeh
+
 #### Dependent packages:
 ```
 Tensorflow 1.4
