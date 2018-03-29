@@ -17,7 +17,9 @@ python demo.py
 
 #### Train FCN network
 See `cfg/unet.cfg.json` as example of config file
+
 See `archs/unet1.py` as example network definision
+
 Run:
 ```angular2html
 python train.py --cfg cfg/your_config.json
